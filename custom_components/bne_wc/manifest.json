@@ -1,10 +1,10 @@
 {
     "domain": "bne_wc",
-    "name": "Brisbane Bin Day Sensor",
-    "documentation": "https://github.com/mark1foley/Brisbane-Bin-Day-Sensor",
-    "issue_tracker": "https://github.com/mark1foley/Brisbane-Bin-Day-Sensor/issues",
+    "name": "Brisbane Bin Day Integration",
+    "documentation": "https://github.com/matterbury/Brisbane-Bin-Day-Sensor",
+    "issue_tracker": "https://github.com/matterbury/Brisbane-Bin-Day-Sensor/issues",
     "dependencies": [],
-    "codeowners": ["@mark1foley"],
+    "codeowners": ["@matterbury"],
     "requirements": [],
     "version": "1.20220521.01"
 }

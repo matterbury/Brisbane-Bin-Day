@@ -1,5 +1,5 @@
 {
-  "name": "Brisbane Bin Day Sensor",
+  "name": "Brisbane Bin Day Integration",
   "content_in_root": false,
   "render_readme": true,
   "iot_class": "Cloud Polling"

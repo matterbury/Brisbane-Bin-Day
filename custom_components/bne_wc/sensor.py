@@ -5,7 +5,6 @@ import pandas as pd
 import voluptuous as vol
 
 from dateutil.parser import parse
-from calendar import weekday
 from datetime import datetime, timedelta, date
 from time import strptime
 from urllib.parse import quote_plus
@@ -29,32 +28,30 @@ ATTR_DUE_IN = "Due In"
 ATTR_ALERT_HOURS = "Alert Hours"
 ATTR_EXTRA_BIN = "Extra Bin"
 ATTR_RECYCLE_WEEK = "Recycle Week"
+ATTR_GREEN_WEEK = "Green Week"
 
 CONF_BASE_URL = 'base_url'
 CONF_WASTE_DAYS_TABLE = 'days_table'
 CONF_WASTE_WEEKS_TABLE = 'weeks_table'
 CONF_PROPERTY_NUMBER = 'property_number'
 CONF_ICON = 'icon'
-CONF_RECYCLE_ICON = 'recycle_icon'
-
 CONF_ALERT_HOURS = 'alert_hours'
 CONF_GREEN_BIN = 'green_bin'
 
 DEFAULT_ICON = 'mdi:trash-can'
-DEFAULT_RECYCLE_ICON = 'mdi:recycle'
 DEFAULT_ALERT_HOURS = 12
 
-# Throttle updates to every 5 minutes 
+# Throttle updates to every 5 minutes
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=300)
 
 WEEK_DAYS = 7
 DAY_HOURS = 24
 HOUR_SECONDS = 3600
 
-def is_valid_date(date):
-    if date:
+def is_valid_date(d):
+    if d:
         try:
-            parse(date)
+            parse(d)
             return True
         except:
             return False
@@ -63,14 +60,13 @@ def is_valid_date(date):
 def due_in_hours(time_stamp: datetime):
     """Get the remaining hours from now until a given datetime object."""
     diff = time_stamp - datetime.now()
-    _LOGGER.debug("...Due In: Now: {0} Next Collection: {1} Seconds: {2}, Hours: {3}".format(datetime.now(), time_stamp, diff.seconds, math.ceil(diff.seconds/HOUR_SECONDS)))
+    _LOGGER.debug(
+        "...Due In: Now: {0} Next Collection: {1} Seconds: {2}, Hours: {3}".
+        format(datetime.now(), time_stamp, diff.seconds, math.ceil(diff.seconds/HOUR_SECONDS)))
     return math.ceil(diff.seconds/HOUR_SECONDS) + (diff.days*DAY_HOURS)
 
 def date_today():
     return datetime.combine(date.today(), datetime.min.time())
-    
-def week_day():
-    return datetime.today().weekday()
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_NAME): cv.string,
@@ -80,35 +76,24 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_PROPERTY_NUMBER): cv.positive_int,
     vol.Optional(CONF_ALERT_HOURS, default=DEFAULT_ALERT_HOURS): cv.positive_int,
     vol.Optional(CONF_ICON, default=DEFAULT_ICON): cv.string,
-    vol.Optional(CONF_RECYCLE_ICON, default=DEFAULT_RECYCLE_ICON): cv.string,
     vol.Optional(CONF_GREEN_BIN, default=False): cv.boolean
 })
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Get the waste collection sensor."""
-    
-    data_normal = BneWasteCollection(config.get(CONF_BASE_URL), config.get(CONF_WASTE_DAYS_TABLE), config.get(CONF_WASTE_WEEKS_TABLE), config.get(CONF_PROPERTY_NUMBER),config.get(CONF_GREEN_BIN),False)
-    data_recycle = BneWasteCollection(config.get(CONF_BASE_URL), config.get(CONF_WASTE_DAYS_TABLE), config.get(CONF_WASTE_WEEKS_TABLE), config.get(CONF_PROPERTY_NUMBER),config.get(CONF_GREEN_BIN),True)
-    recycleSensorName = config.get(CONF_NAME) + " (Recycle)"
 
     sensors = []
-
-    # Add normal week sensor
-    sensors.append(BneWasteCollectionSensor(
-        data_normal, 
-        config.get(CONF_NAME),
-        config.get(CONF_ICON),
-        config.get(CONF_ALERT_HOURS)
-    ))
-
-    # Add recycle week sensor
-    sensors.append(BneWasteCollectionSensor(
-        data_recycle, 
-        recycleSensorName,
-        config.get(CONF_RECYCLE_ICON),
-        config.get(CONF_ALERT_HOURS)
-    ))
-
+    sensors.append(
+        BneWasteCollectionSensor(
+            BneWasteCollection(config.get(CONF_BASE_URL),
+                               config.get(CONF_WASTE_DAYS_TABLE),
+                               config.get(CONF_WASTE_WEEKS_TABLE),
+                               config.get(CONF_PROPERTY_NUMBER),
+                               config.get(CONF_GREEN_BIN)),
+            config.get(CONF_NAME),
+            config.get(CONF_ICON),
+            config.get(CONF_ALERT_HOURS)
+        ))
     add_devices(sensors)
 
 class BneWasteCollectionSensor(Entity):
@@ -136,7 +121,9 @@ class BneWasteCollectionSensor(Entity):
     def state(self):
         """Return the state of the sensor."""
         collection = self._get_collection_details()
-        _LOGGER.debug("...State Update: Due In {0} Alert Hours: {1}".format(collection[ATTR_DUE_IN], self._alert_hours))
+        _LOGGER.debug(
+            "...State Update: Due In {0} Alert Hours: {1}".
+            format(collection[ATTR_DUE_IN], self._alert_hours))
         return STATE_ON if 0 < collection[ATTR_DUE_IN] <= self._alert_hours else STATE_OFF
 
     @property
@@ -144,19 +131,19 @@ class BneWasteCollectionSensor(Entity):
         """Return the state attributes."""
         collection_details = self._get_collection_details()
         attrs = {
-            ATTR_ALERT_HOURS: self._alert_hours,
-            ATTR_PROPERTY_NUMBER: collection_details[ATTR_PROPERTY_NUMBER],
-            ATTR_SUBURB: collection_details[ATTR_SUBURB],
-            ATTR_STREET: collection_details[ATTR_STREET],
-            ATTR_HOUSE_NUMBER: collection_details[ATTR_HOUSE_NUMBER],
-            ATTR_COLLECTION_DAY: collection_details[ATTR_COLLECTION_DAY],
-            ATTR_COLLECTION_ZONE: collection_details[ATTR_COLLECTION_ZONE],
+            ATTR_PROPERTY_NUMBER:      self._property_number,
+            ATTR_SUBURB:               collection_details[ATTR_SUBURB],
+            ATTR_STREET:               collection_details[ATTR_STREET],
+            ATTR_HOUSE_NUMBER:         collection_details[ATTR_HOUSE_NUMBER],
+            ATTR_COLLECTION_DAY:       collection_details[ATTR_COLLECTION_DAY],
+            ATTR_COLLECTION_ZONE:      collection_details[ATTR_COLLECTION_ZONE],
             ATTR_NEXT_COLLECTION_DATE: collection_details[ATTR_NEXT_COLLECTION_DATE],
-            ATTR_EXTRA_BIN: collection_details[ATTR_EXTRA_BIN],
-            ATTR_DUE_IN: collection_details[ATTR_DUE_IN],
-            ATTR_RECYCLE_WEEK: collection_details[ATTR_RECYCLE_WEEK]
+            ATTR_DUE_IN:               collection_details[ATTR_DUE_IN],
+            ATTR_ALERT_HOURS:          self._alert_hours,
+            ATTR_EXTRA_BIN:            collection_details[ATTR_EXTRA_BIN],
+            ATTR_RECYCLE_WEEK:         collection_details[ATTR_RECYCLE_WEEK],
+            ATTR_GREEN_WEEK:           collection_details[ATTR_GREEN_WEEK]
         }
-
         return attrs
 
     @property
@@ -169,72 +156,98 @@ class BneWasteCollectionSensor(Entity):
         _LOGGER.debug("Sensor Update:")
         _LOGGER.debug("...Name: {0}".format(self._name))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_PROPERTY_NUMBER,self.extra_state_attributes[ATTR_PROPERTY_NUMBER]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_PROPERTY_NUMBER,
+                self.extra_state_attributes[ATTR_PROPERTY_NUMBER]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_PROPERTY_NUMBER))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_SUBURB,self.extra_state_attributes[ATTR_SUBURB]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_SUBURB,
+                self.extra_state_attributes[ATTR_SUBURB]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_SUBURB))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_STREET,self.extra_state_attributes[ATTR_STREET]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_STREET,
+                self.extra_state_attributes[ATTR_STREET]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_STREET))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_HOUSE_NUMBER,self.extra_state_attributes[ATTR_HOUSE_NUMBER]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_HOUSE_NUMBER,
+                self.extra_state_attributes[ATTR_HOUSE_NUMBER]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_HOUSE_NUMBER))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_COLLECTION_DAY,self.extra_state_attributes[ATTR_COLLECTION_DAY]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_COLLECTION_DAY,
+                self.extra_state_attributes[ATTR_COLLECTION_DAY]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_COLLECTION_DAY))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_COLLECTION_ZONE,self.extra_state_attributes[ATTR_COLLECTION_ZONE]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_COLLECTION_ZONE,
+                self.extra_state_attributes[ATTR_COLLECTION_ZONE]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_COLLECTION_ZONE))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_NEXT_COLLECTION_DATE,self.extra_state_attributes[ATTR_NEXT_COLLECTION_DATE]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_NEXT_COLLECTION_DATE,
+                self.extra_state_attributes[ATTR_NEXT_COLLECTION_DATE]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_NEXT_COLLECTION_DATE))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_EXTRA_BIN,self.extra_state_attributes[ATTR_EXTRA_BIN]))
-        except:
-            _LOGGER.debug("...{0} not defined".format(ATTR_EXTRA_BIN))
-        try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_ALERT_HOURS,self.extra_state_attributes[ATTR_ALERT_HOURS]))
-        except:
-            _LOGGER.debug("...{0} not defined".format(ATTR_ALERT_HOURS))
-        try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_DUE_IN,self.extra_state_attributes[ATTR_DUE_IN]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_DUE_IN,
+                self.extra_state_attributes[ATTR_DUE_IN]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_DUE_IN))
         try:
-            _LOGGER.debug("...{0}: {1}".format(ATTR_RECYCLE_WEEK,self.extra_state_attributes[ATTR_RECYCLE_WEEK]))
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_ALERT_HOURS,
+                self.extra_state_attributes[ATTR_ALERT_HOURS]))
+        except:
+            _LOGGER.debug("...{0} not defined".format(ATTR_ALERT_HOURS))
+        try:
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_EXTRA_BIN,
+                self.extra_state_attributes[ATTR_EXTRA_BIN]))
+        except:
+            _LOGGER.debug("...{0} not defined".format(ATTR_EXTRA_BIN))
+        try:
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_RECYCLE_WEEK,
+                self.extra_state_attributes[ATTR_RECYCLE_WEEK]))
         except:
             _LOGGER.debug("...{0} not defined".format(ATTR_RECYCLE_WEEK))
+        try:
+            _LOGGER.debug("...{0}: {1}".format(
+                ATTR_GREEN_WEEK,
+                self.extra_state_attributes[ATTR_GREEN_WEEK]))
+        except:
+            _LOGGER.debug("...{0} not defined".format(ATTR_GREEN_WEEK))
 
 class BneWasteCollection(object):
     """The Class for handling the data retrieval."""
 
-    def __init__(self, base_url, days_table, weeks_table, property_number, green_bin, recycle_week):
+    def __init__(self, base_url, days_table, weeks_table, property_number, green_bin):
         """Initialize the info object."""
         self._base_url = base_url
         self._days_table = days_table
         self._weeks_table = weeks_table
         self._property_number = property_number
         self._green_bin = green_bin
-        self._recycle_week = recycle_week
         self.info = {}
-        
+
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
-
-        collection = self._get_collection_details() if self._property_number else {}
+        collection = {}
+        if self._property_number:
+            self._get_collection_details()
         self._get_extra_bin(collection)
 
-    def _get_collection_details(self):
-
-        collection = {}
+    def _get_collection_details(self, collection):
         _LOGGER.info("Updating Waste Collection data")
         try:
             collection[ATTR_PROPERTY_NUMBER] = self._property_number
@@ -246,7 +259,9 @@ class BneWasteCollection(object):
             response = requests.get(full_url)
             json=response.json()
             if 'error_code' in json:
-                _LOGGER.error("Error retrieving collection day dataset: {0}: {1}".format(json['error_code'], json['message']))
+                _LOGGER.error(
+                    "Error retrieving collection day dataset: {0}: {1}".
+                    format(json['error_code'], json['message']))
             else:
                 _LOGGER.info("...Successfully retrieved collection day dataset")
                 dic=json['results']
@@ -258,64 +273,72 @@ class BneWasteCollection(object):
                     collection[ATTR_COLLECTION_DAY] = df['collection_day'].iloc[0]
                     collection[ATTR_COLLECTION_ZONE] = df['zone'].iloc[0]
 
+                    # If the DoW of collection day is after today's DoW then
+                    # the next collection is this week else it's next week.
                     collection_day_no = strptime(collection[ATTR_COLLECTION_DAY],'%A').tm_wday
                     current_day_no = datetime.today().weekday()
-                    if collection_day_no > current_day_no:
-                        collection[ATTR_NEXT_COLLECTION_DATE] = (date_today() + timedelta(days=collection_day_no-current_day_no)).isoformat()
-                    else:
-                        collection[ATTR_NEXT_COLLECTION_DATE] = (date_today() + timedelta(days=(WEEK_DAYS+collection_day_no)-current_day_no)).isoformat()
-        
+                    days_offset = 0 if collection_day_no > current_day_no else WEEK_DAYS
+                    days_to_next_collection = days_offset + collection_day_no - current_day_no
+                    collection[ATTR_NEXT_COLLECTION_DATE] = (
+                        date_today() + timedelta(days=days_to_next_collection)).isoformat()
                 else:
                     _LOGGER.error('Collection day dataset zero rows returned')
+
         except requests.exceptions.RequestException as e:
-                _LOGGER.error("updating collection day got {}.".format(requests.exceptions.RequestException))
-                
+            _LOGGER.error("updating collection day got {}.".format(e))
+
         return collection
 
     def _get_extra_bin(self, collection):
-        # Waste Collection Algorithm 
-        # Explanation:
-        # If the ZONE for the address matches the ZONE for the week, it is yellow recycling bin week.
-        # If the ZONE for the address does not match the ZONE for the week, it is green waste bin week.
+        # If the ZONE for the address matches the ZONE for the week,
+        #   it is yellow recycling bin week.
+        # If the ZONE for the address does not match the ZONE for the week,
+        #   it is green waste bin week.
         collection_day_no = strptime(collection[ATTR_COLLECTION_DAY],'%A').tm_wday
-        weekStartDate = parse(collection[ATTR_NEXT_COLLECTION_DATE]) - timedelta(days=collection_day_no)
-        weekStartString = f'{weekStartDate:%Y-%m-%d}'
+        week_start_date = (parse(collection[ATTR_NEXT_COLLECTION_DATE]) -
+                           timedelta(days=collection_day_no))
+        week_start_string = f'{week_start_date:%Y-%m-%d}'
 
         try:
             full_url = self._base_url.format(**{
                 'dataset_id': self._weeks_table,
-                'query': quote_plus("week_starting = date'{0}' AND search(zone, '{1}')".format(str(weekStartString).replace("'", "\\'"), str(collection[ATTR_COLLECTION_ZONE]).replace("'", "\\'")))
+                'query': quote_plus(
+                    "week_starting = date'{0}' AND search(zone, '{1}')".
+                    format(str(week_start_string).replace("'", "\\'"),
+                           str(collection[ATTR_COLLECTION_ZONE]).replace("'", "\\'")))
             })
             _LOGGER.info("...Week query: {0}".format(full_url))
+
             response = requests.get(full_url)
             json=response.json()
+
             if 'error_code' in json:
-                _LOGGER.error("Error retrieving collection week dataset: {0}: {1}".format(json['error_code'], json['message']))
+                _LOGGER.error(
+                    "Error retrieving collection week dataset: {0}: {1}".
+                    format(json['error_code'], json['message']))
             else:
                 _LOGGER.info("...Successfully retrieved collection week dataset")
                 dic=json['results']
                 df = pd.DataFrame(dic)
-                collection[ATTR_RECYCLE_WEEK] = self._recycle_week
-                if self._recycle_week:
+
+                # If a row is returned then it's a recycling week else it's a
+                # green waste week.
+                if len(df.index) > 0:
                     collection[ATTR_EXTRA_BIN] = 'Yellow/Recycling'
-                    if len(df.index) == 0:
-                        # If no row returned then next collection date is not recycling week so advance collection date one week
-                        collection[ATTR_NEXT_COLLECTION_DATE] = (parse(collection[ATTR_NEXT_COLLECTION_DATE]) + timedelta(days=WEEK_DAYS)).isoformat()
+                    collection[ATTR_RECYCLE_WEEK] = True
+                    collection[ATTR_GREEN_WEEK] = False
                 else:
-                    # "Normal" week
-                    if self._green_bin: 
-                        collection[ATTR_EXTRA_BIN] = 'Green/Garden'
-                    else:
-                        collection[ATTR_EXTRA_BIN] = ''
-                    if len(df.index) > 0:
-                        # If row returned then next collection date is recycling week so advance collection date one week
-                        collection[ATTR_NEXT_COLLECTION_DATE] = (parse(collection[ATTR_NEXT_COLLECTION_DATE]) + timedelta(days=WEEK_DAYS)).isoformat()
+                    collection[ATTR_EXTRA_BIN] = 'Green/Garden'
+                    collection[ATTR_RECYCLE_WEEK] = False
+                    collection[ATTR_GREEN_WEEK] = True
 
                 if is_valid_date(collection[ATTR_NEXT_COLLECTION_DATE]):
-                    collection[ATTR_DUE_IN] = due_in_hours(parse(collection[ATTR_NEXT_COLLECTION_DATE]))
+                    collection[ATTR_DUE_IN] = due_in_hours(
+                        parse(collection[ATTR_NEXT_COLLECTION_DATE]))
                 else:
-                    collection[ATTR_DUE_IN] = -1                        
+                    collection[ATTR_DUE_IN] = -1
+
         except requests.exceptions.RequestException as e:
-            _LOGGER.error("updating collection week got {}.".format(requests.exceptions.RequestException))
+            _LOGGER.error("updating collection week got {}.".format(e))
 
         self.info = collection
