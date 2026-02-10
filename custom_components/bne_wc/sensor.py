@@ -131,7 +131,7 @@ class BneWasteCollectionSensor(Entity):
         """Return the state attributes."""
         collection_details = self._get_collection_details()
         attrs = {
-            ATTR_PROPERTY_NUMBER:      self._property_number,
+            ATTR_PROPERTY_NUMBER:      collection_details[ATTR_PROPERTY_NUMBER],
             ATTR_SUBURB:               collection_details[ATTR_SUBURB],
             ATTR_STREET:               collection_details[ATTR_STREET],
             ATTR_HOUSE_NUMBER:         collection_details[ATTR_HOUSE_NUMBER],
