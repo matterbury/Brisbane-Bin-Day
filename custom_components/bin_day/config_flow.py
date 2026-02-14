@@ -79,7 +79,6 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
                         CONF_SENSOR_NAME,
                         default=DEFAULT_SENSOR_NAME
                     ): cv.string,
-                    vol.Required(CONF_PROPERTY_NUMBER): cv.positive_int,
                     vol.Required(
                         CONF_BASE_URL,
                         default=DEFAULT_BASE_URL
@@ -108,6 +107,7 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
                         CONF_ALERT_HOURS,
                         default=DEFAULT_ALERT_HOURS
                     ): cv.positive_int,
+                    vol.Required(CONF_PROPERTY_NUMBER): cv.positive_int,
                     vol.Optional(
                         CONF_HAS_GREEN_BIN,
                         default=False
@@ -135,7 +135,7 @@ class BinDayOptionFlowHandler(OptionsFlow):
                     ): cv.string,
                     vol.Required(
                         CONF_BASE_URL,
-                        default=self.config_entry.options[CONF_PROPERTY_NUMBER]
+                        default=self.config_entry.options[CONF_BASE_URL]
                     ): cv.string,
                     vol.Required(
                         CONF_DAYS_TABLE,
