@@ -21,18 +21,18 @@
   "options": {
     "step": {
       "init": {
-        "description": "[%key:component::bin_day::config::step::user::description%]",
+        "description": "Configure the BCC API for Waste Collection.",
         "data": {
-          "sensor_name": "[%key:common::config_flow::data::name%]",
-          "base_url": "[%key:component::bin_day::config::step::user::data::base_url%]",
-          "days_table": "[%key:component::bin_day::config::step::user::data::days_table%]",
-          "weeks_table": "[%key:component::bin_day::config::step::user::data::weeks_table%]",
-          "polling_interval_hours": "[%key:component::bin_day::config::step::user::data::polling_interval_hours%]",
-          "normal_icon": "[%key:component::bin_day::config::step::user::data::normal_icon%]",
-          "recycling_icon": "[%key:component::bin_day::config::step::user::data::recycling_icon%]",
-          "alert_hours": "[%key:component::bin_day::config::step::user::data::alert_hours%]",
-          "property_number": "[%key:component::bin_day::config::step::user::data::property_number%]",
-          "has_green_bin": "[%key:component::bin_day::config::step::user::data::has_green_bin%]"
+          "sensor_name": "Name of the sensor in Home Assistant",
+          "base_url": "The URL to the BCC API, including '{dataset}' and '{query}' parameters",
+          "days_table": "Name of the collection days dataset",
+          "weeks_table": "Name of the collection weeks dataset",
+          "polling_interval_hours": "How frequently (in hours) to poll the BCC API",
+          "normal_icon": "The mdi: icon to use for the normal (not recycling) week entity",
+          "recycling_icon": "The mdi: icon to use for the recycling week entity",
+          "alert_hours": "Hours in advance of midnight on collection day to enable entities",
+          "property_number": "The id number of the collection property",
+          "has_green_bin": "True if you have a green bin for collection, else False"
         }
       }
     }

@@ -78,7 +78,7 @@ OPTIONS_SCHEMA = vol.Schema(
     }
 )
 
-class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
+class BinDayConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Brisbane Bin Day."""
 
     VERSION = 1
@@ -128,5 +128,5 @@ class BinDayOptionFlowHandler(OptionsFlow):
             data_schema=self.add_suggested_values_to_schema(
                 OPTIONS_SCHEMA, self.config_entry.options
             ),
-            errors={},
+            errors={}
         )
