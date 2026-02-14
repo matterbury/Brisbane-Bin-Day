@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import Final
 
-DOMAIN: Final = 'bne_wc'
+DOMAIN: Final = 'bin_day'
 
 CONF_SENSOR_NAME: Final = 'sensor_name'
 CONF_PROPERTY_NUMBER: Final = 'property_number'

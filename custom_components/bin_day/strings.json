@@ -21,18 +21,18 @@
   "options": {
     "step": {
       "init": {
-        "description": "[%key:component::bne_wc::config::step::user::description%]",
+        "description": "[%key:component::bin_day::config::step::user::description%]",
         "data": {
           "sensor_name": "[%key:common::config_flow::data::name%]",
-          "property_number": "[%key:component::bne_wc::config::step::user::data::property_number%]",
-          "base_url": "[%key:component::bne_wc::config::step::user::data::base_url%]",
-          "days_table": "[%key:component::bne_wc::config::step::user::data::days_table%]",
-          "weeks_table": "[%key:component::bne_wc::config::step::user::data::weeks_table%]",
-          "polling_interval_hours": "[%key:component::bne_wc::config::step::user::data::polling_interval_hours%]",
-          "normal_icon": "[%key:component::bne_wc::config::step::user::data::normal_icon%]",
-          "recycling_icon": "[%key:component::bne_wc::config::step::user::data::recycling_icon%]",
-          "alert_hours": "[%key:component::bne_wc::config::step::user::data::alert_hours%]",
-          "has_green_bin": "[%key:component::bne_wc::config::step::user::data::has_green_bin%]",
+          "property_number": "[%key:component::bin_day::config::step::user::data::property_number%]",
+          "base_url": "[%key:component::bin_day::config::step::user::data::base_url%]",
+          "days_table": "[%key:component::bin_day::config::step::user::data::days_table%]",
+          "weeks_table": "[%key:component::bin_day::config::step::user::data::weeks_table%]",
+          "polling_interval_hours": "[%key:component::bin_day::config::step::user::data::polling_interval_hours%]",
+          "normal_icon": "[%key:component::bin_day::config::step::user::data::normal_icon%]",
+          "recycling_icon": "[%key:component::bin_day::config::step::user::data::recycling_icon%]",
+          "alert_hours": "[%key:component::bin_day::config::step::user::data::alert_hours%]",
+          "has_green_bin": "[%key:component::bin_day::config::step::user::data::has_green_bin%]",
         }
       }
     }
