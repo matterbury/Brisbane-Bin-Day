@@ -11,12 +11,12 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow
 )
-from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
     DOMAIN,
+    CONF_SENSOR_NAME,
     CONF_PROPERTY_NUMBER,
     CONF_BASE_URL,
     CONF_DAYS_TABLE,
@@ -26,6 +26,7 @@ from .const import (
     CONF_RECYCLING_ICON,
     CONF_ALERT_HOURS,
     CONF_HAS_GREEN_BIN,
+    DEFAULT_SENSOR_NAME,
     DEFAULT_BASE_URL,
     DEFAULT_DAYS_TABLE,
     DEFAULT_WEEKS_TABLE,
@@ -55,7 +56,7 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
         """Handle a flow initiated by the user."""
         if user_input is not None:
             return self.async_create_entry(
-                title=user_input[CONF_NAME],
+                title=user_input[CONF_SENSOR_NAME],
                 data={},
                 options={
                     CONF_BASE_URL: user_input[CONF_BASE_URL],
@@ -74,6 +75,10 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
+                    vol.Required(
+                        CONF_SENSOR_NAME,
+                        default=DEFAULT_SENSOR_NAME
+                    ): cv.string,
                     vol.Required(
                         CONF_BASE_URL,
                         default=DEFAULT_BASE_URL
@@ -125,6 +130,10 @@ class BinDayOptionFlowHandler(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
+                    vol.Required(
+                        CONF_SENSOR_NAME,
+                        default=self.config_entry.options[CONF_SENSOR_NAME]
+                    ): cv.string,
                     vol.Required(
                         CONF_BASE_URL,
                         default=self.config_entry.options[CONF_BASE_URL]
