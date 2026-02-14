@@ -65,37 +65,34 @@ class BccApiDataUpdateCoordinator(DataUpdateCoordinator[BccApiData]):
     def _get_days_data(self, base_url, days_table, property_number, api_data):
         """Fetch the data that the days table provides."""
 
-        # Note: asyncio.TimeoutError and aiohttp.ClientError are already
-        # handled by the data update coordinator.
-        async with async_timeout.timeout(10):
-            try:
-                full_url = base_url.format(**{
-                    'dataset': days_table,
-                    'query': quote_plus(f"property_id={property_number}")
-                })
+        try:
+            full_url = base_url.format(**{
+                'dataset': days_table,
+                'query': quote_plus(f"property_id={property_number}")
+            })
 
-                response = requests.get(full_url, timeout=60)
-                json=response.json()
+            response = requests.get(full_url, timeout=60)
+            json=response.json()
 
-                if 'error_code' in json:
-                    _LOGGER.error(
-                        "Error retrieving collection day dataset: %s: %s",
-                        json['error_code'], json['message'])
+            if 'error_code' in json:
+                _LOGGER.error(
+                    "Error retrieving collection day dataset: %s: %s",
+                    json['error_code'], json['message'])
+            else:
+                dic = json['results']
+                df = pandas.DataFrame(dic)
+
+                if len(df.index) > 0:
+                    api_data.suburb = df['suburb'].iloc[0]
+                    api_data.street = df['street_name'].iloc[0]
+                    api_data.house_number = df['house_number'].iloc[0]
+                    api_data.collection_day = df['collection_day'].iloc[0]
+                    api_data.collection_zone = int(df['zone'].iloc[0])
                 else:
-                    dic = json['results']
-                    df = pandas.DataFrame(dic)
+                    _LOGGER.error('Collection day dataset zero rows returned')
 
-                    if len(df.index) > 0:
-                        api_data.suburb = df['suburb'].iloc[0]
-                        api_data.street = df['street_name'].iloc[0]
-                        api_data.house_number = df['house_number'].iloc[0]
-                        api_data.collection_day = df['collection_day'].iloc[0]
-                        api_data.collection_zone = int(df['zone'].iloc[0])
-                    else:
-                        _LOGGER.error('Collection day dataset zero rows returned')
-
-            except requests.exceptions.RequestException:
-                _LOGGER.exception("Error requetsing collection day data")
+        except requests.exceptions.RequestException:
+            _LOGGER.exception("Error requetsing collection day data")
 
     def _get_weeks_data(self, base_url, weeks_table, api_data):
         """Fetch the data that the weeks table provides.""" 
@@ -108,27 +105,24 @@ class BccApiDataUpdateCoordinator(DataUpdateCoordinator[BccApiData]):
         query_zone = str(api_data.collection_zone).replace("'", "\\'")
         query = f"week_starting=date'{query_date}' AND search(zone,'{query_zone}')"
 
-        # Note: asyncio.TimeoutError and aiohttp.ClientError are already
-        # handled by the data update coordinator.
-        async with async_timeout.timeout(10):
-            try:
-                full_url = base_url.format(**{
-                    'dataset': weeks_table,
-                    'query': quote_plus(query)
-                })
+        try:
+            full_url = base_url.format(**{
+                'dataset': weeks_table,
+                'query': quote_plus(query)
+            })
 
-                response = requests.get(full_url, timeout=60)
-                json=response.json()
+            response = requests.get(full_url, timeout=60)
+            json=response.json()
 
-                if 'error_code' in json:
-                    _LOGGER.error(
-                        "Error retrieving collection week dataset: %s: %s",
-                        json['error_code'], json['message'])
-                else:
-                    dic = json['results']
-                    df = pandas.DataFrame(dic)
+            if 'error_code' in json:
+                _LOGGER.error(
+                    "Error retrieving collection week dataset: %s: %s",
+                    json['error_code'], json['message'])
+            else:
+                dic = json['results']
+                df = pandas.DataFrame(dic)
 
-                    api_data.recycling_week = len(df.index) > 0
+                api_data.recycling_week = len(df.index) > 0
 
-            except requests.exceptions.RequestException:
-                _LOGGER.exception("Error requesting collection week data")
+        except requests.exceptions.RequestException:
+            _LOGGER.exception("Error requesting collection week data")
