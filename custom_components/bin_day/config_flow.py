@@ -11,7 +11,6 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow
 )
-from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 
@@ -57,11 +56,9 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
         """Handle a flow initiated by the user."""
         if user_input is not None:
             return self.async_create_entry(
-                title=user_input[CONF_NAME],
+                title=user_input[CONF_SENSOR_NAME],
                 data={},
                 options={
-                    CONF_SENSOR_NAME: user_input[CONF_SENSOR_NAME],
-                    CONF_PROPERTY_NUMBER: user_input[CONF_PROPERTY_NUMBER],
                     CONF_BASE_URL: user_input[CONF_BASE_URL],
                     CONF_DAYS_TABLE: user_input[CONF_DAYS_TABLE],
                     CONF_WEEKS_TABLE: user_input[CONF_WEEKS_TABLE],
@@ -69,6 +66,7 @@ class BinDayFlowHandler(ConfigFlow, domain=DOMAIN):
                     CONF_NORMAL_ICON: user_input[CONF_NORMAL_ICON],
                     CONF_RECYCLING_ICON: user_input[CONF_RECYCLING_ICON],
                     CONF_ALERT_HOURS: user_input[CONF_ALERT_HOURS],
+                    CONF_PROPERTY_NUMBER: user_input[CONF_PROPERTY_NUMBER],
                     CONF_HAS_GREEN_BIN: user_input[CONF_HAS_GREEN_BIN],
                 },
             )
@@ -136,10 +134,6 @@ class BinDayOptionFlowHandler(OptionsFlow):
                         default=self.config_entry.options[CONF_SENSOR_NAME]
                     ): cv.string,
                     vol.Required(
-                        CONF_PROPERTY_NUMBER,
-                        default=self.config_entry.options[CONF_PROPERTY_NUMBER]
-                    ): cv.positive_int,
-                    vol.Required(
                         CONF_BASE_URL,
                         default=self.config_entry.options[CONF_PROPERTY_NUMBER]
                     ): cv.string,
@@ -166,6 +160,10 @@ class BinDayOptionFlowHandler(OptionsFlow):
                     vol.Required(
                         CONF_ALERT_HOURS,
                         default=self.config_entry.options[CONF_ALERT_HOURS]
+                    ): cv.positive_int,
+                    vol.Required(
+                        CONF_PROPERTY_NUMBER,
+                        default=self.config_entry.options[CONF_PROPERTY_NUMBER]
                     ): cv.positive_int,
                     vol.Optional(
                         CONF_HAS_GREEN_BIN,
