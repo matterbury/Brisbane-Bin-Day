@@ -5,7 +5,6 @@ from typing import Final
 
 DOMAIN: Final = 'bin_day'
 
-CONF_SENSOR_NAME: Final = 'sensor_name'
 CONF_PROPERTY_NUMBER: Final = 'property_number'
 CONF_BASE_URL: Final = 'base_url'
 CONF_DAYS_TABLE: Final = 'days_table'
@@ -16,7 +15,6 @@ CONF_RECYCLING_ICON: Final = 'recycling_icon'
 CONF_ALERT_HOURS: Final = 'alert_hours'
 CONF_HAS_GREEN_BIN: Final = 'has_green_bin'
 
-DEFAULT_SENSOR_NAME: Final = 'Brisbane Bin Day'
 DEFAULT_BASE_URL: Final = (
     'https://www.data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/'
     '{dataset}/records?where={query}&limit=1')
