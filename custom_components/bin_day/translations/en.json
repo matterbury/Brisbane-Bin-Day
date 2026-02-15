@@ -4,7 +4,7 @@
       "user": {
         "description": "Configure the BCC API for Waste Collection.",
         "data": {
-          "sensor_name": "Name of the sensor in Home Assistant",
+          "service_name": "Name of the service in Home Assistant",
           "base_url": "The URL to the BCC API, including '{dataset}' and '{query}' parameters",
           "days_table": "Name of the collection days dataset",
           "weeks_table": "Name of the collection weeks dataset",
@@ -23,7 +23,7 @@
       "init": {
         "description": "Configure the BCC API for Waste Collection.",
         "data": {
-          "sensor_name": "Name of the sensor in Home Assistant",
+          "service_name": "Name of the service in Home Assistant",
           "base_url": "The URL to the BCC API, including '{dataset}' and '{query}' parameters",
           "days_table": "Name of the collection days dataset",
           "weeks_table": "Name of the collection weeks dataset",

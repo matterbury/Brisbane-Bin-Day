@@ -3,10 +3,10 @@
     "name": "Brisbane Bin Day integration",
     "codeowners": ["@matterbury"],
     "config_flow": true,
-    "documentation": "https://github.com/matterbury/Brisbane-Bin-Day-Sensor",
+    "documentation": "https://github.com/matterbury/Brisbane-Bin-Day",
     "integration_type": "service",
     "iot_class": "cloud_polling",
-    "issue_tracker": "https://github.com/matterbury/Brisbane-Bin-Day-Sensor/issues",
+    "issue_tracker": "https://github.com/matterbury/Brisbane-Bin-Day/issues",
     "dependencies": [],
     "requirements": [],
     "version": "1.20260214.01"

@@ -25,7 +25,7 @@ from homeassistant.helpers.event import async_track_utc_time_change
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, CONF_SENSOR_NAME
+from .const import DOMAIN, CONF_SERVICE_NAME
 from .data import BccApiData
 from .coordinator import BccApiDataUpdateCoordinator
 
@@ -133,7 +133,7 @@ async def async_setup_entry(
     async_add_entities(
         BinDaySensorEntity(
             entry_id=entry.entry_id,
-            sensor_name=entry.options[CONF_SENSOR_NAME],
+            service_name=entry.options[CONF_SERVICE_NAME],
             coordinator=coordinator,
             entity_description=entity_description,
         )
@@ -151,7 +151,7 @@ class BinDaySensorEntity(CoordinatorEntity[BccApiDataUpdateCoordinator], SensorE
         self,
         *,
         entry_id: str,
-        sensor_name: str,
+        service_name: str,
         coordinator: BccApiDataUpdateCoordinator,
         entity_description: BinDaySensorEntityDescription,
     ) -> None:
@@ -164,10 +164,10 @@ class BinDaySensorEntity(CoordinatorEntity[BccApiDataUpdateCoordinator], SensorE
         self._attr_device_info = DeviceInfo(
             entry_type=DeviceEntryType.SERVICE,
             identifiers={(DOMAIN, entry_id)},
-            name=sensor_name,
+            name=service_name,
         )
 
-        _LOGGER.debug("Added sensor %s to device %s", self.entity_id, sensor_name)
+        _LOGGER.debug("Added sensor %s to service %s", self.entity_id, service_name)
 
     async def _update_callback(self, _now: datetime) -> None:
         """Update the entity without fetching data from server."""
