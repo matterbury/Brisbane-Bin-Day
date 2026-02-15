@@ -100,6 +100,7 @@ class BinDayConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 title=user_input[CONF_SENSOR_NAME],
                 data={},
                 options={
+                    CONF_SENSOR_NAME: user_input[CONF_SENSOR_NAME],
                     CONF_BASE_URL: user_input[CONF_BASE_URL],
                     CONF_DAYS_TABLE: user_input[CONF_DAYS_TABLE],
                     CONF_WEEKS_TABLE: user_input[CONF_WEEKS_TABLE],

@@ -128,16 +128,12 @@ async def async_setup_entry(
         async_add_entities: AddEntitiesCallback
 ) -> None:
     """Defer sensor setup to the shared sensor module."""
-    try:
-        _LOGGER.debug("Add device with options %s", entry.options)
-    except:
-        _LOGGER.debug("Add device <UNKNOWN>")
-
     coordinator: BccApiDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
         BinDaySensorEntity(
             entry_id=entry.entry_id,
+            sensor_name=entry.options[CONF_SENSOR_NAME],
             coordinator=coordinator,
             entity_description=entity_description,
         )
@@ -155,6 +151,7 @@ class BinDaySensorEntity(CoordinatorEntity[BccApiDataUpdateCoordinator], SensorE
         self,
         *,
         entry_id: str,
+        sensor_name: str,
         coordinator: BccApiDataUpdateCoordinator,
         entity_description: BinDaySensorEntityDescription,
     ) -> None:
@@ -167,10 +164,10 @@ class BinDaySensorEntity(CoordinatorEntity[BccApiDataUpdateCoordinator], SensorE
         self._attr_device_info = DeviceInfo(
             entry_type=DeviceEntryType.SERVICE,
             identifiers={(DOMAIN, entry_id)},
-            name="Brisbane bin day",
+            name=sensor_name,
         )
 
-        _LOGGER.debug("Added sensor %s", self.entity_id)
+        _LOGGER.debug("Added sensor %s to device %s", self.entity_id, sensor_name)
 
     async def _update_callback(self, _now: datetime) -> None:
         """Update the entity without fetching data from server."""
