@@ -100,6 +100,11 @@ SENSORS: tuple[BinDaySensorEntityDescription, ...] = (
         value=lambda data: data.next_collection_date(),
     ),
     BinDaySensorEntityDescription(
+        key="is_bin_time",
+        translation_key="is_bin_time",
+        value=lambda data: data.is_bin_time(),
+    ),
+    BinDaySensorEntityDescription(
         key="due_in_hours",
         translation_key="due_in_hours",
         value=lambda data: data.due_in_hours(),

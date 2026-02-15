@@ -50,6 +50,10 @@ class BccApiData:
         return (None if self.collection_day is None else
                 strptime(self.collection_day, '%A').tm_wday)
 
+    def is_bin_time(self) -> bool:
+        """Compute whether it's time to take the bins out."""
+        return self.due_in_hours() <= self.alert_hours
+
     def next_collection_date(self) -> datetime | None:
         """Compute the date of the next collection from our collection day."""
         collection_day_no = self.collection_week_day()
@@ -83,7 +87,3 @@ class BccApiData:
         """Compute whether the next collection includes the green waste bin."""
         return (False if self.recycling_week is None else
                 self.has_green_bin and not self.recycling_week)
-
-    def is_bin_time(self) -> bool:
-        """Compute whether it's time to take the bins out."""
-        return self.due_in_hours() <= self.alert_hours

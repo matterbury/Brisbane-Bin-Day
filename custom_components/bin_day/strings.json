@@ -66,6 +66,9 @@
       "polling_interval_hours": {
         "name": "Polling Interval Hours"
       },
+      "is_bin_time": {
+        "name": "Is Bin Time"
+      },
       "next_collection_date": {
         "name": "Next Collection Date"
       },
