@@ -129,7 +129,7 @@ async def async_setup_entry(
 ) -> None:
     """Defer sensor setup to the shared sensor module."""
     try:
-        _LOGGER.debug("Add device %s", entry.options.get(CONF_SENSOR_NAME))
+        _LOGGER.debug("Add device with options %s", entry.options)
     except:
         _LOGGER.debug("Add device <UNKNOWN>")
 
