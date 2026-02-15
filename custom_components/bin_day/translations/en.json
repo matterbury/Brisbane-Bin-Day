@@ -11,7 +11,7 @@
           "polling_interval_hours": "How frequently (in hours) to poll the BCC API",
           "normal_icon": "The mdi: icon to use for the normal (not recycling) week entity",
           "recycling_icon": "The mdi: icon to use for the recycling week entity",
-          "alert_hours": "Hours in advance of midnight on collection day to enable entities",
+          "alert_hours": "Hours in advance of midnight on collection day to alert",
           "property_number": "The id number of the collection property",
           "has_green_bin": "True if you have a green bin for collection, else False"
         }
@@ -30,7 +30,7 @@
           "polling_interval_hours": "How frequently (in hours) to poll the BCC API",
           "normal_icon": "The mdi: icon to use for the normal (not recycling) week entity",
           "recycling_icon": "The mdi: icon to use for the recycling week entity",
-          "alert_hours": "Hours in advance of midnight on collection day to enable entities",
+          "alert_hours": "Hours in advance of midnight on collection day to alert",
           "property_number": "The id number of the collection property",
           "has_green_bin": "True if you have a green bin for collection, else False"
         }
