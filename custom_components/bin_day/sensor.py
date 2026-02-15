@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-#import logging
+import logging
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -25,9 +25,11 @@ from homeassistant.helpers.event import async_track_utc_time_change
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_SENSOR_NAME
 from .data import BccApiData
 from .coordinator import BccApiDataUpdateCoordinator
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -126,6 +128,11 @@ async def async_setup_entry(
         async_add_entities: AddEntitiesCallback
 ) -> None:
     """Defer sensor setup to the shared sensor module."""
+    try:
+        _LOGGER.debug("Add device %s", entry.options.get(CONF_SENSOR_NAME))
+    except:
+        _LOGGER.debug("Add device <UNKNOWN>")
+
     coordinator: BccApiDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
@@ -162,6 +169,8 @@ class BinDaySensorEntity(CoordinatorEntity[BccApiDataUpdateCoordinator], SensorE
             identifiers={(DOMAIN, entry_id)},
             name="Brisbane bin day",
         )
+
+        _LOGGER.debug("Added sensor %s", self.entity_id)
 
     async def _update_callback(self, _now: datetime) -> None:
         """Update the entity without fetching data from server."""

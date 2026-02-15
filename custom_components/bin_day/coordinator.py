@@ -51,6 +51,8 @@ class BccApiDataUpdateCoordinator(DataUpdateCoordinator[BccApiData]):
 
     async def _async_update_data(self) -> BccApiData:
         """Fetch the data from the BCC API and parse it and return it."""
+        _LOGGER.debug("Updating the BCC API data")
+
         property_number = self._config.options.get(CONF_PROPERTY_NUMBER)
         alert_hours = self._config.options.get(CONF_ALERT_HOURS)
         polling_interval_hours = self._config.options.get(CONF_POLLING_INTERVAL_HOURS)
@@ -99,7 +101,7 @@ class BccApiDataUpdateCoordinator(DataUpdateCoordinator[BccApiData]):
                     _LOGGER.error('Collection day dataset zero rows returned')
 
         except requests.exceptions.RequestException:
-            _LOGGER.exception("Error requetsing collection day data")
+            _LOGGER.exception("Error requesting collection day data")
 
     def _get_weeks_data(self, base_url, weeks_table, api_data):
         """Fetch the data that the weeks table provides.""" 
