@@ -38,14 +38,14 @@ class BccApiDataUpdateCoordinator(DataUpdateCoordinator[BccApiData]):
         """Initialize the BCC API coordinator."""
         self._config = config_entry
 
-        polling_interval = config_entry.options.get(CONF_POLLING_INTERVAL_HOURS)
+        update_interval = config_entry.options.get(CONF_POLLING_INTERVAL_HOURS)
 
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
             config_entry=config_entry,
-            update_interval=timedelta(hours=polling_interval),
+            update_interval=timedelta(hours=update_interval),
             always_update=False
         )
 
